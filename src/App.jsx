@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import InitialChoice from './components/InitialChoice';
 import ChallengeAnalysis from './components/ChallengeAnalysis';
@@ -11,8 +11,10 @@ import AnalysisResults from './components/AnalysisResults';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProgressSteps from './components/ProgressSteps';
 import Header from './components/Header'; // Import the Header component
+import Auth from './components/Auth'; // Import Auth component
 import { parseFundamentals } from './utils/parseFundamentals.js'; // Ensure correct import path
 import { StorageService } from './services/storageService'; // Correct import
+import { SupabaseService } from './services/supabaseService'; // Import Supabase service
 
 // Define the backend URL from environment variables or use default
 const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -29,6 +31,45 @@ export default function App() {
   const [navigationHistory, setNavigationHistory] = useState(['input']);
   const [error, setError] = useState(null);
   const [analysisResult, setAnalysisResult] = useState(null); // New state for analysis results
+  const [user, setUser] = useState(null); // State for authenticated user
+  const [loading, setLoading] = useState(true); // Loading state for auth check
+
+  // Check for authenticated user on app load
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await SupabaseService.getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error checking user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkUser();
+  }, []);
+
+  // Handler for successful authentication
+  const handleAuthSuccess = async () => {
+    try {
+      const currentUser = await SupabaseService.getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error('Error getting user after auth:', error);
+    }
+  };
+
+  // Handler for sign out
+  const handleSignOut = async () => {
+    try {
+      await SupabaseService.signOut();
+      setUser(null);
+      handleReset(); // Reset app state
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
   // Handler for analyzing data
   const handleAnalyze = async (payload) => {
@@ -77,6 +118,21 @@ const API_URL = `${BACKEND_URL}/api/analyze`;
         selectedSections: payload.selectedSections,
         analysisResult: payload.sectionType === 'fundamentals' ? parseFundamentals(data.content) : data.content,
       });
+
+      // Save to Supabase if user is authenticated
+      if (user) {
+        try {
+          await SupabaseService.saveAnalysis({
+            inputData: payload.inputData,
+            selectedSections: payload.selectedSections,
+            analysisResult: payload.sectionType === 'fundamentals' ? parseFundamentals(data.content) : data.content,
+          });
+          console.log('Analysis saved to Supabase successfully');
+        } catch (supabaseError) {
+          console.error('Error saving to Supabase:', supabaseError);
+          // Don't fail the entire operation if Supabase save fails
+        }
+      }
 
       // Navigate to 'results' step
       handleStepChange('results');
@@ -215,10 +271,27 @@ const API_URL = `${BACKEND_URL}/api/analyze`;
     );
   };
 
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show authentication screen if user is not signed in
+  if (!user) {
+    return <Auth onAuthSuccess={handleAuthSuccess} />;
+  }
+
   return (
     <ErrorBoundary>
-      {/* Header Component */}
-      <Header />
+      {/* Header Component with Sign Out */}
+      <Header user={user} onSignOut={handleSignOut} />
 
       {/* Main Routes */}
       <Routes>
@@ -233,8 +306,6 @@ const API_URL = `${BACKEND_URL}/api/analyze`;
         
         {/* Strategic Calibration Route */}
         <Route path="/strategic-calibration" element={<StrategicCalibration />} />
-        
-        {/* Removed the Methodology Admin Route */}
         
         {/* Fallback Route */}
         <Route path="*" element={
