@@ -12,6 +12,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ProgressSteps from './components/ProgressSteps';
 import Header from './components/Header'; // Import the Header component
 import Auth from './components/Auth'; // Import Auth component
+import AnalysisHistory from './components/AnalysisHistory'; // Import Analysis History component
 import { parseFundamentals } from './utils/parseFundamentals.js'; // Ensure correct import path
 import { StorageService } from './services/storageService'; // Correct import
 import { SupabaseService } from './services/supabaseService'; // Import Supabase service
@@ -69,6 +70,18 @@ export default function App() {
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  // Handler for selecting an analysis from history
+  const handleSelectAnalysis = (analysis) => {
+    setInputData(analysis.input_data);
+    setSelectedSections(analysis.selected_sections);
+    setAnalysisResult(analysis.analysis_result);
+    setCurrentStep('results');
+    setNavigationHistory(['input', 'results']);
+    
+    // Navigate to analysis page
+    window.location.href = '/analysis';
   };
 
   // Handler for analyzing data
@@ -306,6 +319,9 @@ const API_URL = `${BACKEND_URL}/api/analyze`;
         
         {/* Strategic Calibration Route */}
         <Route path="/strategic-calibration" element={<StrategicCalibration />} />
+        
+        {/* Analysis History Route */}
+        <Route path="/history" element={<AnalysisHistory onSelectAnalysis={handleSelectAnalysis} />} />
         
         {/* Fallback Route */}
         <Route path="*" element={

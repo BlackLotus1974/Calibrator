@@ -30,6 +30,12 @@ const Header = ({ user, onSignOut }) => {
         >
           Home
         </Link>
+        <Link 
+          to="/history" 
+          className="text-gray-600 hover:text-gray-900"
+        >
+          History
+        </Link>
         
         {/* User Info and Sign Out */}
         {user && (
