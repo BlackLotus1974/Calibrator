@@ -1,5 +1,5 @@
--- Enable Row Level Security
-ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
+-- Note: auth.users table already exists and has RLS enabled by default in Supabase
+-- We don't need to modify it
 
 -- Create analyses table
 CREATE TABLE public.analyses (

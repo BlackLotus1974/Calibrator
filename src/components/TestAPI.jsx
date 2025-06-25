@@ -7,7 +7,28 @@ export const TestAPI = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
-  const [debugInfo, setDebugInfo] = useState({});
+  const [debugInfo, setDebugInfo] = useState({
+    apiKeyExists: !!import.meta.env.VITE_GEMINI_API_KEY, // Check for Gemini Key
+    apiKeyStart: import.meta.env.VITE_GEMINI_API_KEY // Use Gemini Key
+      ? import.meta.env.VITE_GEMINI_API_KEY.substring(0, 5)
+      : 'Not found',
+    envVars: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')),
+    fullEnvVars: 
+      Object.entries(import.meta.env).filter(([key]) => key.startsWith('VITE_'))
+        .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {}),
+    rawApiKey: import.meta.env.VITE_GEMINI_API_KEY || 'not found' // Use Gemini Key
+  });
+
+  // Add Supabase debug info
+  const supabaseDebugInfo = {
+    supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+    supabaseUrlExists: !!import.meta.env.VITE_SUPABASE_URL,
+    supabaseKeyExists: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+    supabaseKeyStart: import.meta.env.VITE_SUPABASE_ANON_KEY 
+      ? import.meta.env.VITE_SUPABASE_ANON_KEY.substring(0, 10) + '...'
+      : 'Not found',
+    allViteVars: Object.keys(import.meta.env).filter(key => key.startsWith('VITE_'))
+  };
 
   useEffect(() => {
     // Debug information (Updated for Gemini)
@@ -66,6 +87,14 @@ export const TestAPI = () => {
         <h3 className="font-semibold mb-2">Debug Information:</h3>
         <pre className="text-sm overflow-x-auto">
           {JSON.stringify(debugInfo, null, 2)}
+        </pre>
+      </div>
+
+      {/* Supabase Debug Information */}
+      <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+        <h3 className="font-semibold mb-2 text-blue-800">Supabase Debug Information:</h3>
+        <pre className="text-sm overflow-x-auto">
+          {JSON.stringify(supabaseDebugInfo, null, 2)}
         </pre>
       </div>
 

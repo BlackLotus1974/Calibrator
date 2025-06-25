@@ -74,26 +74,24 @@ Strategic Calibrator is a strategic analysis tool designed to help organizations
    - Run the SQL schema in the Supabase SQL Editor (copy from `supabase-schema.sql`)
    - Enable email authentication in Authentication > Settings
 
-4. **Create environment variables:**
+4. **Configure environment variables:**
 
-   Create a `.env.local` file in the root directory:
+   The project includes a `.env` template file. Update it with your Supabase credentials:
 
+   **Get your Supabase credentials:**
+   - Go to [Supabase Dashboard](https://supabase.com/dashboard)
+   - Select your project (or create a new one)
+   - Go to Settings → API
+   - Copy the "Project URL" and "anon/public" key
+
+   **Update the `.env` file:**
    ```bash
-   # Supabase Configuration
-   VITE_SUPABASE_URL=your_supabase_project_url
-   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-   # Backend Configuration
-   PORT=3001
-   NODE_ENV=development
-
-   # API Keys (if needed)
-   OPENAI_API_KEY=your_openai_api_key
-   GOOGLE_API_KEY=your_google_api_key
-
-   # CORS Configuration
-   CORS_ORIGIN=http://localhost:5173
+   # Replace the placeholder values in .env:
+   VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
+
+   Note: The backend has its own `.env` file in the `backend/` directory with different configuration.
 
 5. **Start the development server:**
 
