@@ -971,32 +971,16 @@ app.listen(PORT, () => {
 
 // Graceful shutdown
 const shutdown = (signal) => {
-  console.log(`\n${signal} received. Starting graceful shutdown...`);
-  // Stop accepting new connections
-  server.close(async () => {
+  console.log(`\n${signal} received. Closing HTTP server...`);
+  server.close(() => {
     console.log('HTTP server closed.');
-    // Wait for the queue to finish processing ongoing tasks
-    try {
-      console.log(`Waiting for ${queue.size} tasks in queue and ${queue.pending} pending tasks to finish...`);
-      await queue.onIdle(); // Wait until the queue is empty and all promises have resolved
-      console.log('Processing queue finished.');
-    } catch (queueError) {
-        console.error("Error during queue shutdown:", queueError);
-    } finally {
-       // Close database connections, etc., here if needed
-       console.log('Shutdown complete.');
-       process.exit(0); // Exit cleanly
-    }
+    console.log('Server gracefully shut down.');
+    process.exit(0);
   });
-
-  // If server hasn't finished closing in time, force exit
-  setTimeout(() => {
-      console.error('Graceful shutdown timed out. Forcing exit.');
-      process.exit(1);
-  }, 15000); // 15 seconds timeout
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-// export default app;
+// Export for Vercel
+export default app;
