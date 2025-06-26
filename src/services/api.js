@@ -1,7 +1,7 @@
 // FILE: /src/services/api.js
 
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'; // Base Backend URL
-const API_KEY = import.meta.env.VITE_API_KEY; // Frontend API Key
+const BACKEND_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000'); // Base Backend URL
+const API_KEY = import.meta.env.VITE_FRONTEND_API_KEY; // Frontend API Key
 
 export const ApiService = {
   async get(endpoint) {
