@@ -2,6 +2,8 @@ import path, { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'fs';
+import os from 'os';
+import fse from 'fs-extra';
 
 // __filename/__dirname for ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -30,7 +32,6 @@ import rateLimit from 'express-rate-limit';
 import PQueue from 'p-queue';
 import fetch from 'node-fetch'; // Still needed? Maybe not if only using Gemini SDK
 import multer from 'multer';
-import fse from 'fs-extra';
 import mammoth from 'mammoth';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Document, Paragraph, HeadingLevel, Packer, TextRun } from 'docx';
@@ -46,7 +47,9 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Directory setup
-const UPLOAD_DIR = join(__dirname, 'uploads');
+// Use the Vercel /tmp directory for uploads in production, otherwise use local directory
+const isVercel = process.env.VERCEL_URL;
+const UPLOAD_DIR = isVercel ? join(os.tmpdir(), 'uploads') : join(__dirname, 'uploads');
 const METHODOLOGY_DIR = join(UPLOAD_DIR, 'methodology');
 const ADDITIONAL_DOCS_DIR = join(UPLOAD_DIR, 'additional-documents');
 
@@ -995,3 +998,5 @@ const shutdown = (signal) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
+
+// export default app;
