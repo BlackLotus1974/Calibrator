@@ -15,7 +15,11 @@ const envPath = path.resolve(__dirname, '.env');
 dotenv.config({ path: envPath });
 
 console.log('ENV path:', envPath, 'exists?', fs.existsSync(envPath));
-console.log('ENV contents:\n', fs.readFileSync(envPath, 'utf8'));
+if (fs.existsSync(envPath)) {
+  console.log('ENV contents:\n', fs.readFileSync(envPath, 'utf8'));
+} else {
+  console.log('ENV file not found, using environment variables from deployment platform');
+}
 
 // Verify if the key is loaded immediately after config
 console.log('Attempting to load GEMINI_API_KEY:', process.env.GEMINI_API_KEY ? 'Loaded' : 'Not Loaded');
