@@ -16,6 +16,7 @@ import AnalysisHistory from './components/AnalysisHistory'; // Import Analysis H
 import { parseFundamentals } from './utils/parseFundamentals.js'; // Ensure correct import path
 import { StorageService } from './services/storageService'; // Correct import
 import { SupabaseService } from './services/supabaseService'; // Import Supabase service
+import { getSupabaseClient } from './lib/supabase'; // Correctly import the function
 
 // Define the backend URL from environment variables or use default
 const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -34,9 +35,13 @@ export default function App() {
   const [analysisResult, setAnalysisResult] = useState(null); // New state for analysis results
   const [user, setUser] = useState(null); // State for authenticated user
   const [loading, setLoading] = useState(true); // Loading state for auth check
+  const [isConfigValid, setConfigValid] = useState(true); // New state for config check
 
   // Check for authenticated user on app load
   useEffect(() => {
+    // The check for Supabase client is removed from here to prevent a race condition.
+    // The lazy-loaded supabase instance will handle initialization on first use.
+
     const checkUser = async () => {
       try {
         const currentUser = await SupabaseService.getCurrentUser();
@@ -291,6 +296,28 @@ const API_URL = `${BACKEND_URL}/api/analyze`;
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show a clear error screen if the configuration is invalid
+  if (!isConfigValid) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-50">
+        <div className="text-center p-8 border-2 border-red-200 rounded-lg bg-white max-w-2xl">
+          <h1 className="text-3xl font-bold text-red-700 mb-4">
+            Application Configuration Invalid
+          </h1>
+          <p className="text-gray-700 text-lg mb-2">
+            The application cannot connect to the backend services.
+          </p>
+          <p className="text-gray-600">
+            Please check that your <strong>.env</strong> file in the project's root directory is correct and contains valid <strong>VITE_SUPABASE_URL</strong> and <strong>VITE_SUPABASE_ANON_KEY</strong> values.
+          </p>
+          <p className="mt-4 text-sm text-gray-500">
+            After correcting the file, please restart the development server.
+          </p>
         </div>
       </div>
     );
