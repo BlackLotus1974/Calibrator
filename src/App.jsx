@@ -16,10 +16,9 @@ import AnalysisHistory from './components/AnalysisHistory'; // Import Analysis H
 import { parseFundamentals } from './utils/parseFundamentals.js'; // Ensure correct import path
 import { StorageService } from './services/storageService'; // Correct import
 import { SupabaseService } from './services/supabaseService'; // Import Supabase service
-import { getSupabaseClient } from './lib/supabase'; // Correctly import the function
 
 // Define the backend URL from environment variables or use default
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BACKEND_URL = import.meta.env.PROD ? '' : 'http://localhost:5000'; // Use relative path in production
 
 export default function App() {
   // State variables
