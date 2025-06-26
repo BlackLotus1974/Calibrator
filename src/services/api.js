@@ -1,6 +1,6 @@
 // FILE: /src/services/api.js
 
-const BACKEND_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000'); // Base Backend URL
+const BACKEND_URL = import.meta.env.PROD ? '' : 'http://localhost:5000'; // Use relative path in production
 const API_KEY = import.meta.env.VITE_FRONTEND_API_KEY; // Frontend API Key
 
 export const ApiService = {
