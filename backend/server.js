@@ -92,6 +92,8 @@ app.use(
       // Allow requests with no origin (like server-to-server, Postman)
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow Vercel deployment URLs
+      if (origin && origin.includes('.vercel.app')) return callback(null, true);
       console.warn(`CORS blocked for origin: ${origin}`); // Log blocked origins
       return callback(new Error('Not allowed by CORS'));
     },
