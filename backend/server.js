@@ -76,7 +76,9 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // Needed for form data if not using JSON exclusively
 
 // CORS
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174']; // Add your frontend URLs
+const allowedOriginsFromEnv = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174', ...allowedOriginsFromEnv];
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -953,7 +955,6 @@ app.use((err, req, res, next) => {
 
 // --- Start Server ---
 // Start server
-/*
 app.listen(PORT, () => {
   console.log('-------------------------------------------------------');
   console.log(` Backend Server running on http://localhost:${PORT}`);
@@ -964,7 +965,6 @@ app.listen(PORT, () => {
   console.log(` Queue: ${QUEUE_CONFIG.concurrency} concurrency, ${QUEUE_CONFIG.intervalCap} per ${QUEUE_CONFIG.interval}ms, timeout ${QUEUE_CONFIG.timeout}ms`);
   console.log('-------------------------------------------------------');
 });
-*/
 
 // Graceful shutdown
 const shutdown = (signal) => {
@@ -995,5 +995,3 @@ const shutdown = (signal) => {
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
-
-export default app;
