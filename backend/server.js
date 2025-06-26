@@ -952,18 +952,21 @@ app.use((err, req, res, next) => {
 
 
 // --- Start Server ---
-const server = app.listen(PORT, () => {
-  console.log(`-------------------------------------------------------`);
+// Start server
+/*
+app.listen(PORT, () => {
+  console.log('-------------------------------------------------------');
   console.log(` Backend Server running on http://localhost:${PORT}`);
-  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(` Environment: ${process.env.NODE_ENV}`);
   console.log(` CORS allowing origins: ${allowedOrigins.join(', ')}`);
   console.log(` Uploads directory: ${UPLOAD_DIR}`);
   console.log(`Rate Limit: ${rateLimitOptions.max} reqs per ${rateLimitOptions.windowMs/1000}s per IP for /api/analyze`);
   console.log(` Queue: ${QUEUE_CONFIG.concurrency} concurrency, ${QUEUE_CONFIG.intervalCap} per ${QUEUE_CONFIG.interval}ms, timeout ${QUEUE_CONFIG.timeout}ms`);
-  console.log(`-------------------------------------------------------`);
+  console.log('-------------------------------------------------------');
 });
+*/
 
-// --- Graceful Shutdown ---
+// Graceful shutdown
 const shutdown = (signal) => {
   console.log(`\n${signal} received. Starting graceful shutdown...`);
   // Stop accepting new connections
@@ -990,5 +993,7 @@ const shutdown = (signal) => {
   }, 15000); // 15 seconds timeout
 };
 
-process.on('SIGTERM', () => shutdown('SIGTERM')); // Standard signal for termination
-process.on('SIGINT', () => shutdown('SIGINT'));  // Signal for Ctrl+C
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+export default app;
